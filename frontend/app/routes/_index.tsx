@@ -23,20 +23,6 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-const productSchema = yup.object().shape({
-  sku: yup
-    .string()
-    .matches(/^[A-Z]{2}-\d+$/, "Invalid SKU")
-    .required("SKU is required"),
-  quantity: yup
-    .number()
-    .required("Quantity is required")
-    .positive("Quantity must be positive")
-    .integer("Quantity must be an integer"),
-  description: yup.string().required("Description is required"),
-  store: yup.string().required("Store is required"),
-});
-
 export default function Index() {
   const fetchHandler = useFetchHandler();
   const { headers, rows, readFile, loading } = useFileHandler();
@@ -44,27 +30,31 @@ export default function Index() {
 
   const [modalName, setModalName] = useState<string | null>(null);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const productSelected = products.filter(
     (product) => selectedSku === product.sku
   )[0];
 
-  const handleSubmit = (values: { file: File | null }) => {
+  const handleImport = (values: { file: File | null }) => {
     if (!values.file) return;
     readFile(values.file);
-    setModalName(null);
-  };
-
-  useEffect(() => {
-    if (rows.length) {
-      init(rows);
+    const errors = init(rows);
+    if (errors.length > 0) {
+      setError(`SKU already exists: ${errors.join(", ")}`);
+    } else {
+      setModalName(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows]);
+  };
 
   const openModal = (sku: string | null, name: string) => {
     setSelectedSku(sku);
     setModalName(name);
+  };
+
+  const closeModal = () => {
+    setModalName(null);
+    setError(null);
   };
 
   const handleEdit = async (values: IProduct) => {
@@ -83,9 +73,14 @@ export default function Index() {
     clear();
   };
 
-  const handleAdd = async (values: IProduct) => {
-    add(values);
-    setModalName(null);
+  const handleAdd = (values: IProduct) => {
+    add(values)
+      .then(() => {
+        setModalName(null);
+      })
+      .catch((error) => {
+        setError(error);
+      });
   };
 
   const handleSaveAll = async () => {
@@ -156,25 +151,27 @@ export default function Index() {
         )}
 
         {modalName === "add" && (
-          <Modal title="Add Product" closeModal={() => setModalName(null)}>
-            <FormProduct productSelected={null} onSubmit={handleAdd} />
+          <Modal title="Add Product" closeModal={closeModal}>
+            <FormProduct
+              productSelected={null}
+              onSubmit={handleAdd}
+              error={error}
+            />
           </Modal>
         )}
 
         {modalName === "edit" && (
-          <Modal
-            title={`Edit Product ${selectedSku}`}
-            closeModal={() => setModalName(null)}
-          >
+          <Modal title={`Edit Product ${selectedSku}`} closeModal={closeModal}>
             <FormProduct
               productSelected={productSelected}
               onSubmit={handleEdit}
+              error={error}
             />
           </Modal>
         )}
 
         {modalName === "delete" && (
-          <Modal title="Delete Product" closeModal={() => setModalName(null)}>
+          <Modal title="Delete Product" closeModal={closeModal}>
             <div className="py-4">
               <Typography.P>
                 Are you sure you want to delete this product?
@@ -187,8 +184,8 @@ export default function Index() {
         )}
 
         {modalName === "import" && (
-          <Modal title="Import Products" closeModal={() => setModalName(null)}>
-            <FormImport onSubmit={handleSubmit} />
+          <Modal title="Import Products" closeModal={closeModal}>
+            <FormImport onSubmit={handleImport} error={error} />
           </Modal>
         )}
       </div>

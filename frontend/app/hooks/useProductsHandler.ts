@@ -4,18 +4,28 @@ import { useState } from "react";
 const useProductsHandler = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
 
-  const init = (data: string[][]): void => {
-    const newProducts = data.map((row: string[]) => {
-      return {
-        quantity: Number(row[0]),
-        sku: row[1],
-        description: row[2],
-        store: row[3],
-        updated: true,
-        saved: false,
-      };
-    });
+  const init = (data: string[][]): string[] => {
+    const errors: string[] = [];
+    const newProducts = data
+      .filter((row: string[]) => {
+        const exist = products.find(
+          (product) => product.sku.trim() === row[1].trim()
+        );
+        if (exist) errors.push(exist.sku);
+        return !exist;
+      })
+      .map((row: string[]) => {
+        return {
+          quantity: Number(row[0].trim()),
+          sku: row[1].trim(),
+          description: row[2].trim(),
+          store: row[3].trim(),
+          updated: true,
+          saved: false,
+        };
+      });
     setProducts([...products, ...newProducts]);
+    return errors;
   };
 
   const update = (sku: string, data: IProduct): void => {
@@ -39,8 +49,15 @@ const useProductsHandler = () => {
     setProducts([]);
   };
 
-  const add = (data: IProduct): void => {
-    setProducts([...products, data]);
+  const add = async (data: IProduct) => {
+    return new Promise<string>((resolve, reject) => {
+      if (products.find((product) => product.sku.trim() === data.sku.trim())) {
+        reject("SKU already exists");
+        return;
+      }
+      setProducts([...products, data]);
+      resolve("Product added successfully");
+    });
   };
 
   return { products, init, update, remove, clear, add };

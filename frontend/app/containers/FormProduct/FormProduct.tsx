@@ -4,6 +4,7 @@ import Input from "~/components/Input/Input";
 import IProduct from "~/types/IProduct";
 import * as yup from "yup";
 import InputTextArea from "~/components/InputTextArea/InputTextArea";
+import Alert from "~/components/Alert/Alert";
 
 const productSchema = yup.object().shape({
   sku: yup
@@ -22,9 +23,14 @@ const productSchema = yup.object().shape({
 interface FormProductProps {
   productSelected: IProduct | null;
   onSubmit: (values: IProduct) => void;
+  error: string | null;
 }
 
-const FormProduct = ({ productSelected, onSubmit }: FormProductProps) => {
+const FormProduct = ({
+  productSelected,
+  onSubmit,
+  error,
+}: FormProductProps) => {
   return (
     <div>
       <Formik
@@ -38,6 +44,7 @@ const FormProduct = ({ productSelected, onSubmit }: FormProductProps) => {
         onSubmit={onSubmit}
       >
         <Form className="mt-4">
+          {error && <Alert message={error} type="error" />}
           <div>
             <Input label="SKU" name="sku" type="text" />
           </div>
