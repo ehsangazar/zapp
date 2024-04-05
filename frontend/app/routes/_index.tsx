@@ -1,9 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Field, Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "~/components/Button/Button";
-import InputFile from "~/components/InputFile/InputFile";
-import Input from "~/components/Input/Input";
 import Layout from "~/components/Layout/Layout";
 import Modal from "~/components/Modal/Modal";
 import Typography from "~/components/Typography/Typography";
@@ -11,7 +8,6 @@ import TableProducts from "~/containers/TableProducts/TableProducts";
 import useFetchHandler from "~/hooks/useFetchHandler";
 import useFileHandler from "~/hooks/useFileHandler";
 import useProductsHandler from "~/hooks/useProductsHandler";
-import * as yup from "yup";
 import FormImport from "~/containers/FormImport/FormImport";
 import FormProduct from "~/containers/FormProduct/FormProduct";
 import IProduct from "~/types/IProduct";
@@ -36,17 +32,6 @@ export default function Index() {
     (product) => selectedSku === product.sku
   )[0];
 
-  const handleImport = (values: { file: File | null }) => {
-    if (!values.file) return;
-    readFile(values.file);
-    const errors = init(rows);
-    if (errors.length > 0) {
-      setError(`SKU already exists: ${errors.join(", ")}`);
-    } else {
-      setModalName(null);
-    }
-  };
-
   const openModal = (sku: string | null, name: string) => {
     setSelectedSku(sku);
     setModalName(name);
@@ -55,6 +40,17 @@ export default function Index() {
   const closeModal = () => {
     setModalName(null);
     setError(null);
+  };
+
+  const handleImport = async (values: { file: File | null }) => {
+    if (!values.file) return;
+    const newRows = await readFile(values.file);
+    const errors = init(newRows);
+    if (errors.length > 0) {
+      setError(`SKU already exists: ${errors.join(", ")}`);
+      return;
+    }
+    setModalName(null);
   };
 
   const handleEdit = async (values: IProduct) => {
@@ -74,13 +70,12 @@ export default function Index() {
   };
 
   const handleAdd = (values: IProduct) => {
-    add(values)
-      .then(() => {
-        setModalName(null);
-      })
-      .catch((error) => {
-        setError(error);
-      });
+    const error = add(values);
+    if (error) {
+      setError(error);
+      return;
+    }
+    setModalName(null);
   };
 
   const handleSaveAll = async () => {

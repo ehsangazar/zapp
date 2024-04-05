@@ -49,15 +49,14 @@ const useProductsHandler = () => {
     setProducts([]);
   };
 
-  const add = async (data: IProduct) => {
-    return new Promise<string>((resolve, reject) => {
-      if (products.find((product) => product.sku.trim() === data.sku.trim())) {
-        reject("SKU already exists");
-        return;
-      }
-      setProducts([...products, data]);
-      resolve("Product added successfully");
-    });
+  const add = (data: IProduct) => {
+    let error = null;
+    if (products.find((product) => product.sku.trim() === data.sku.trim())) {
+      error = "SKU already exists";
+      return;
+    }
+    setProducts([...products, data]);
+    return error;
   };
 
   return { products, init, update, remove, clear, add };

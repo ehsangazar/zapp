@@ -12,7 +12,7 @@ const useFileHandler = () => {
   const [rows = [], setRows] = useState<string[][]>();
 
   const readFile = async (file: File) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<string[][]>((resolve, reject) => {
       setFile(file);
       setLoading(true);
       const reader = new FileReader();
@@ -36,7 +36,7 @@ const useFileHandler = () => {
         });
         setRows(rows);
         setLoading(false);
-        resolve(data);
+        resolve(rows);
       };
       reader.onerror = (error) => {
         setLoading(false);
