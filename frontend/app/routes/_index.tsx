@@ -3,6 +3,7 @@ import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import Button from "~/components/Button/Button";
 import InputFile from "~/components/InputFile/InputFile";
+import Input from "~/components/Input/Input";
 import Layout from "~/components/Layout/Layout";
 import Modal from "~/components/Modal/Modal";
 import Typography from "~/components/Typography/Typography";
@@ -10,6 +11,9 @@ import TableProducts from "~/containers/TableProducts/TableProducts";
 import useFetchHandler from "~/hooks/useFetchHandler";
 import useFileHandler from "~/hooks/useFileHandler";
 import useProductsHandler from "~/hooks/useProductsHandler";
+import * as yup from "yup";
+import FormImport from "~/containers/FormImport/FormImport";
+import FormProduct from "~/containers/FormProduct/FormProduct";
 import IProduct from "~/types/IProduct";
 
 export const meta: MetaFunction = () => {
@@ -18,6 +22,20 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Welcome to Zapp Admin" },
   ];
 };
+
+const productSchema = yup.object().shape({
+  sku: yup
+    .string()
+    .matches(/^[A-Z]{2}-\d+$/, "Invalid SKU")
+    .required("SKU is required"),
+  quantity: yup
+    .number()
+    .required("Quantity is required")
+    .positive("Quantity must be positive")
+    .integer("Quantity must be an integer"),
+  description: yup.string().required("Description is required"),
+  store: yup.string().required("Store is required"),
+});
 
 export default function Index() {
   const fetchHandler = useFetchHandler();
@@ -31,10 +49,9 @@ export default function Index() {
     (product) => selectedSku === product.sku
   )[0];
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const file = event.currentTarget[0].files[0];
-    readFile(file);
+  const handleSubmit = (values: { file: File | null }) => {
+    if (!values.file) return;
+    readFile(values.file);
     setModalName(null);
   };
 
@@ -50,16 +67,9 @@ export default function Index() {
     setModalName(name);
   };
 
-  const handleEdit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  const handleEdit = async (values: IProduct) => {
     if (!selectedSku) return;
-    update(selectedSku, {
-      sku: formData.get("sku") as string,
-      quantity: Number(formData.get("quantity")),
-      description: formData.get("description") as string,
-      store: formData.get("store") as string,
-    });
+    update(selectedSku, values);
     setModalName(null);
   };
 
@@ -88,14 +98,38 @@ export default function Index() {
   return (
     <Layout>
       <div>
-        <div>
+        <div
+          className="
+          grid
+          grid-cols-[1fr_1fr]
+          gap-1
+          md:gap-4
+          mb-4
+          w-full
+        "
+        >
           <div className="flex mb-4">
-            <div className="mr-4">
+            <div className="mr-1 md:mr-4">
               <Button
                 onClick={() => openModal(null, "import")}
                 colorScheme="primary"
               >
                 Import
+              </Button>
+            </div>
+            <div>
+              <Button onClick={handleClear} colorScheme="danger">
+                Clear
+              </Button>
+            </div>
+          </div>
+          <div className=" flex justify-end">
+            <div className="mr-1 md:mr-4">
+              <Button
+                onClick={() => openModal(null, "add")}
+                colorScheme="primary"
+              >
+                Add
               </Button>
             </div>
             <div>
@@ -116,28 +150,18 @@ export default function Index() {
           />
         )}
 
-        {/* edit modal */}
         {modalName === "edit" && (
-          <div>
-            <h2>Edit Modal</h2>
-            <button onClick={() => setModalName(null)}>Close</button>
-            <form onSubmit={handleEdit}>
-              {Object.keys(productSelected).map((key) => (
-                <div key={`edit-form-${key}`}>
-                  <label htmlFor={key}>{key}</label>
-                  <input
-                    type="text"
-                    id={key}
-                    name={key}
-                    defaultValue={productSelected[key as keyof IProduct]}
-                  />
-                </div>
-              ))}
-              <button type="submit">Submit</button>
-            </form>
-          </div>
+          <Modal
+            title={`Edit Product ${selectedSku}`}
+            closeModal={() => setModalName(null)}
+          >
+            <FormProduct
+              productSelected={productSelected}
+              onSubmit={handleEdit}
+            />
+          </Modal>
         )}
-        {/* delete modal */}
+
         {modalName === "delete" && (
           <Modal title="Delete Product" closeModal={() => setModalName(null)}>
             <div className="py-4">
@@ -150,24 +174,10 @@ export default function Index() {
             </Button>
           </Modal>
         )}
-        {/* import Modal */}
+
         {modalName === "import" && (
           <Modal title="Import Products" closeModal={() => setModalName(null)}>
-            <div>
-              <Formik
-                initialValues={{ file: null }}
-                onSubmit={(values) => {
-                  console.log(values);
-                }}
-              >
-                <Form onSubmit={handleSubmit}>
-                  <InputFile label="Select" name="file" />
-                  <Button type="submit" colorScheme="primary">
-                    Submit
-                  </Button>
-                </Form>
-              </Formik>
-            </div>
+            <FormImport onSubmit={handleSubmit} />
           </Modal>
         )}
       </div>
