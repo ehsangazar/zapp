@@ -4,6 +4,7 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   onClick?: () => void;
+  type?: "button" | "submit" | "reset";
 }
 
 const Button = ({
@@ -12,6 +13,7 @@ const Button = ({
   disabled,
   loading,
   onClick,
+  type = "button",
 }: ButtonProps) => {
   const color =
     colorScheme === "primary"
@@ -32,6 +34,7 @@ const Button = ({
       className={`px-4 py-2 rounded text-white ${color} ${hover} transition-colors duration-200 ease-in-out`}
       disabled={disabled}
       onClick={onClick}
+      type={type}
     >
       {loading ? "Loading..." : children}
     </button>

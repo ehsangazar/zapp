@@ -10,11 +10,18 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
   return (
     <div>
       <Header />
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 min-h-no-footer-header">
-        <aside className="p-4 bg-gray-200 col-span-1 md:col-span-1">
+      <div
+        className="
+        min-h-no-footer-header
+        flex
+        flex-col
+        md:flex-row
+      "
+      >
+        <aside className="p-4 bg-gray-200 col-span-1 md:col-span-1 min-w-52">
           <Typography.H3>Welcome</Typography.H3>
         </aside>
-        <main className="p-4">{children}</main>
+        <main className="p-4 w-full">{children}</main>
       </div>
       <Footer />
     </div>

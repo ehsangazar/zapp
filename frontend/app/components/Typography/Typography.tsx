@@ -19,9 +19,9 @@ const H2 = ({ children, dark }: TypographyProps) =>
 
 const H3 = ({ children, dark }: TypographyProps) =>
   dark ? (
-    <h3 className="text-2xl font-bold text-white">{children}</h3>
+    <h3 className="text-2xl font-medium text-white">{children}</h3>
   ) : (
-    <h3 className="text-2xl font-bold text-gray-800">{children}</h3>
+    <h3 className="text-2xl font-medium text-gray-800">{children}</h3>
   );
 
 const H4 = ({ children, dark }: TypographyProps) =>

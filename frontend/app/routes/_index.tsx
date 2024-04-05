@@ -1,7 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
+import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import Button from "~/components/Button/Button";
+import InputFile from "~/components/InputFile/InputFile";
 import Layout from "~/components/Layout/Layout";
+import Modal from "~/components/Modal/Modal";
+import Typography from "~/components/Typography/Typography";
+import TableProducts from "~/containers/TableProducts/TableProducts";
 import useFetchHandler from "~/hooks/useFetchHandler";
 import useFileHandler from "~/hooks/useFileHandler";
 import useProductsHandler from "~/hooks/useProductsHandler";
@@ -30,6 +35,7 @@ export default function Index() {
     event.preventDefault();
     const file = event.currentTarget[0].files[0];
     readFile(file);
+    setModalName(null);
   };
 
   useEffect(() => {
@@ -83,49 +89,33 @@ export default function Index() {
     <Layout>
       <div>
         <div>
-          <div className="grid grid-cols-2 gap-4 pb-4">
-            <Button
-              onClick={() => openModal(null, "import")}
-              colorScheme="primary"
-            >
-              Import
-            </Button>
-            <Button onClick={handleSaveAll} colorScheme="secondary">
-              Save All
-            </Button>
+          <div className="flex mb-4">
+            <div className="mr-4">
+              <Button
+                onClick={() => openModal(null, "import")}
+                colorScheme="primary"
+              >
+                Import
+              </Button>
+            </div>
+            <div>
+              <Button onClick={handleSaveAll} colorScheme="secondary">
+                Save All
+              </Button>
+            </div>
           </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              {headers.map((header, index) => (
-                <th key={`header-${index}`}>{header.toUpperCase()}</th>
-              ))}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product: IProduct, index) => {
-              return (
-                <tr key={`tr-${index}`}>
-                  {Object.keys(product).map((key) => (
-                    <td key={`td-${index}-${key}`}>
-                      {product[key as keyof IProduct]}
-                    </td>
-                  ))}
-                  <td>
-                    <button onClick={() => openModal(product.sku, "edit")}>
-                      Edit
-                    </button>
-                    <button onClick={() => openModal(product.sku, "delete")}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+
+        {loading && <p>Loading...</p>}
+        {products.length === 0 && <p>No products</p>}
+        {products.length > 0 && (
+          <TableProducts
+            headers={headers}
+            products={products}
+            openModal={openModal}
+          />
+        )}
+
         {/* edit modal */}
         {modalName === "edit" && (
           <div>
@@ -149,22 +139,36 @@ export default function Index() {
         )}
         {/* delete modal */}
         {modalName === "delete" && (
-          <div>
-            <h2>Delete Modal</h2>
-            <button onClick={() => setModalName(null)}>Close</button>
-            <button onClick={handleDelete}>Delete</button>
-          </div>
+          <Modal title="Delete Product" closeModal={() => setModalName(null)}>
+            <div className="py-4">
+              <Typography.P>
+                Are you sure you want to delete this product?
+              </Typography.P>
+            </div>
+            <Button onClick={handleDelete} colorScheme="danger">
+              Delete
+            </Button>
+          </Modal>
         )}
         {/* import Modal */}
         {modalName === "import" && (
-          <div>
-            <h2>Import Modal</h2>
-            <button onClick={() => setModalName(null)}>Close</button>
-            <form onSubmit={handleSubmit}>
-              <input type="file" />
-              <button type="submit">Submit</button>
-            </form>
-          </div>
+          <Modal title="Import Products" closeModal={() => setModalName(null)}>
+            <div>
+              <Formik
+                initialValues={{ file: null }}
+                onSubmit={(values) => {
+                  console.log(values);
+                }}
+              >
+                <Form onSubmit={handleSubmit}>
+                  <InputFile label="Select" name="file" />
+                  <Button type="submit" colorScheme="primary">
+                    Submit
+                  </Button>
+                </Form>
+              </Formik>
+            </div>
+          </Modal>
         )}
       </div>
     </Layout>
