@@ -1,6 +1,10 @@
 import type { MetaFunction } from "@remix-run/node";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "~/components/Layout/Layout";
+import useFetchHandler from "~/hooks/useFetchHandler";
+import useFileHandler from "~/hooks/useFileHandler";
+import useProductsHandler from "~/hooks/useProductsHandler";
+import IProduct from "~/types/IProduct";
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,87 +14,68 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const [fileHeaders, setFileHeaders] = useState([]);
-  const [fileData, setFileData] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [modalName, setModalName] = useState(null);
-  const [errorMessages, setErrorMessages] = useState([]);
+  const fetchHandler = useFetchHandler();
+  const { headers, rows, readFile, loading } = useFileHandler();
+  const { products, init, update, remove, clear } = useProductsHandler();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // csv file
+  const [modalName, setModalName] = useState<string | null>(null);
+  const [selectedSku, setSelectedSku] = useState<string | null>(null);
+
+  const productSelected = products.filter(
+    (product) => selectedSku === product.sku
+  )[0];
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const file = event.currentTarget[0].files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const rows = e.target.result.split("\n");
-      const headers = rows[0].split(",");
-      setFileHeaders(headers);
-      const newFileData = rows.map((row) => row.split(","));
-      setFileData(newFileData);
-    };
-    reader.readAsText(file);
+    readFile(file);
   };
 
-  const openEditModal = (index: number) => {
-    setSelectedIndex(index);
-    setModalName("edit");
-  };
+  useEffect(() => {
+    if (rows.length) {
+      init(rows);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows]);
 
-  const openDeleteModal = (index: number) => {
-    setSelectedIndex(index);
-    setModalName("delete");
-  };
-
-  const openImportModal = () => {
-    setModalName("import");
+  const openModal = (sku: string | null, name: string) => {
+    setSelectedSku(sku);
+    setModalName(name);
   };
 
   const handleEdit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newData = fileData.map((row, index) => {
-      if (index === selectedIndex) {
-        return Array.from(formData.values());
-      }
-      return row;
+    if (!selectedSku) return;
+    update(selectedSku, {
+      sku: formData.get("sku") as string,
+      quantity: Number(formData.get("quantity")),
+      description: formData.get("description") as string,
+      store: formData.get("store") as string,
     });
-    setFileData(newData);
     setModalName(null);
   };
 
   const handleDelete = async () => {
-    const newData = fileData.filter((row, index) => index !== selectedIndex);
-    setFileData(newData);
+    if (!selectedSku) return;
+    remove(selectedSku);
     setModalName(null);
   };
 
-  const handleExport = async () => {
-    const csvContent = fileData.map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "export.csv";
-    a.click();
-  };
-
   const handleClear = async () => {
-    setFileData([]);
+    clear();
   };
 
   const handleSaveAll = async () => {
-    // fetchHandler
-    const response = await fetch("/api/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(fileData),
-    });
-    const data = await response.json();
-    if (data.error) {
-      setErrorMessages(data.error);
-    }
+    // // fetchHandler
+    // const response = await fetchHandler({
+    //   url: "/api/save",
+    //   method: "POST",
+    //   body: fileData,
+    // });
+    // if (response) {
+    //   setErrorMessages(response);
+    // }
   };
 
   return (
@@ -99,8 +84,7 @@ export default function Index() {
       <div>
         <div>
           <div>
-            <button onClick={openImportModal}>Import</button>
-            <button onClick={handleExport}>Export</button>
+            <button onClick={() => openModal(null, "import")}>Import</button>
           </div>
           <div>
             <button onClick={handleClear}>Clear</button>
@@ -110,23 +94,26 @@ export default function Index() {
         <table>
           <thead>
             <tr>
-              {fileHeaders.map((header) => (
-                <th key={header}>{header}</th>
+              {headers.map((header, index) => (
+                <th key={`header-${index}`}>{header.toUpperCase()}</th>
               ))}
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {fileData.map((row, index) => {
-              if (index === 0) return null;
+            {products.map((product: IProduct, index) => {
               return (
-                <tr key={index}>
-                  {row.map((column) => (
-                    <td key={column}>{column}</td>
+                <tr key={`tr-${index}`}>
+                  {Object.keys(product).map((key) => (
+                    <td key={`td-${index}-${key}`}>
+                      {product[key as keyof IProduct]}
+                    </td>
                   ))}
                   <td>
-                    <button onClick={() => openEditModal(index)}>Edit</button>
-                    <button onClick={() => openDeleteModal(index)}>
+                    <button onClick={() => openModal(product.sku, "edit")}>
+                      Edit
+                    </button>
+                    <button onClick={() => openModal(product.sku, "delete")}>
                       Delete
                     </button>
                   </td>
@@ -141,19 +128,17 @@ export default function Index() {
             <h2>Edit Modal</h2>
             <button onClick={() => setModalName(null)}>Close</button>
             <form onSubmit={handleEdit}>
-              {fileData
-                .find((row, index) => index === selectedIndex)
-                .map((column, i) => (
-                  <div>
-                    <label>{fileHeaders[i]}</label>
-                    <input
-                      name={fileHeaders[i]}
-                      className="border border-gray-300"
-                      type="text"
-                      value={column}
-                    />
-                  </div>
-                ))}
+              {Object.keys(productSelected).map((key) => (
+                <div key={`edit-form-${key}`}>
+                  <label htmlFor={key}>{key}</label>
+                  <input
+                    type="text"
+                    id={key}
+                    name={key}
+                    defaultValue={productSelected[key as keyof IProduct]}
+                  />
+                </div>
+              ))}
               <button type="submit">Submit</button>
             </form>
           </div>
