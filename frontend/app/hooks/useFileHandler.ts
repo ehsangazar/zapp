@@ -3,7 +3,12 @@ import { useState } from "react";
 const useFileHandler = () => {
   const [file, setFile] = useState<File>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [headers = [], setHeaders] = useState<string[]>();
+  const [headers = [], setHeaders] = useState<string[]>([
+    "Quantity",
+    "SKU",
+    "Description",
+    "Store",
+  ]);
   const [rows = [], setRows] = useState<string[][]>();
 
   const readFile = async (file: File) => {

@@ -1,17 +1,5 @@
 import IProduct from "~/types/IProduct";
-// import * as yup from "yup";
 import { useState } from "react";
-
-// const productSchema = yup.object().shape({
-//   sku: yup.string().required("SKU is required"),
-//   quantity: yup
-//     .number()
-//     .required("Quantity is required")
-//     .positive("Quantity must be positive")
-//     .integer("Quantity must be an integer"),
-//   description: yup.string().required("Description is required"),
-//   store: yup.string().required("Store is required"),
-// });
 
 const useProductsHandler = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -27,7 +15,7 @@ const useProductsHandler = () => {
         saved: false,
       };
     });
-    setProducts(newProducts);
+    setProducts([...products, ...newProducts]);
   };
 
   const update = (sku: string, data: IProduct): void => {
@@ -51,7 +39,11 @@ const useProductsHandler = () => {
     setProducts([]);
   };
 
-  return { products, init, update, remove, clear };
+  const add = (data: IProduct): void => {
+    setProducts([...products, data]);
+  };
+
+  return { products, init, update, remove, clear, add };
 };
 
 export default useProductsHandler;

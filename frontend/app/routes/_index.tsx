@@ -40,7 +40,7 @@ const productSchema = yup.object().shape({
 export default function Index() {
   const fetchHandler = useFetchHandler();
   const { headers, rows, readFile, loading } = useFileHandler();
-  const { products, init, update, remove, clear } = useProductsHandler();
+  const { products, init, update, remove, clear, add } = useProductsHandler();
 
   const [modalName, setModalName] = useState<string | null>(null);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
@@ -81,6 +81,11 @@ export default function Index() {
 
   const handleClear = async () => {
     clear();
+  };
+
+  const handleAdd = async (values: IProduct) => {
+    add(values);
+    setModalName(null);
   };
 
   const handleSaveAll = async () => {
@@ -148,6 +153,12 @@ export default function Index() {
             products={products}
             openModal={openModal}
           />
+        )}
+
+        {modalName === "add" && (
+          <Modal title="Add Product" closeModal={() => setModalName(null)}>
+            <FormProduct productSelected={null} onSubmit={handleAdd} />
+          </Modal>
         )}
 
         {modalName === "edit" && (
