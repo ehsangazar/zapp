@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
+import Button from "~/components/Button/Button";
 import Layout from "~/components/Layout/Layout";
 import useFetchHandler from "~/hooks/useFetchHandler";
 import useFileHandler from "~/hooks/useFileHandler";
@@ -80,15 +81,18 @@ export default function Index() {
 
   return (
     <Layout>
-      <h1>Welcome to Zapp Admin</h1>
       <div>
         <div>
-          <div>
-            <button onClick={() => openModal(null, "import")}>Import</button>
-          </div>
-          <div>
-            <button onClick={handleClear}>Clear</button>
-            <button onClick={handleSaveAll}>Save All</button>
+          <div className="grid grid-cols-2 gap-4 pb-4">
+            <Button
+              onClick={() => openModal(null, "import")}
+              colorScheme="primary"
+            >
+              Import
+            </Button>
+            <Button onClick={handleSaveAll} colorScheme="secondary">
+              Save All
+            </Button>
           </div>
         </div>
         <table>
