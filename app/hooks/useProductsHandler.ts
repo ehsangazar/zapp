@@ -31,6 +31,12 @@ const useProductsHandler = () => {
     return errors;
   };
 
+  const ifSkusExists = (sku: string): boolean => {
+    return products.find((product) => product.sku.trim() === sku.trim())
+      ? true
+      : false;
+  };
+
   const update = (sku: string, data: IProduct): void => {
     const newProducts = products.map((product: IProduct) => {
       if (product.sku === sku) {
@@ -62,7 +68,7 @@ const useProductsHandler = () => {
     return error;
   };
 
-  return { products, init, update, remove, clear, add };
+  return { products, init, update, remove, clear, add, ifSkusExists };
 };
 
 export default useProductsHandler;

@@ -1,9 +1,7 @@
 import * as yup from "yup";
-interface IProduct {
-  sku: string;
-  quantity: number;
-  description: string;
-  store: string;
+import { Product } from "@prisma/client";
+
+interface IProduct extends Product {
   isValid?: boolean;
   errors?: string[];
 }

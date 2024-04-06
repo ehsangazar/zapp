@@ -1,10 +1,6 @@
 import IProduct from "~/types/IProduct";
 
-interface FetchHandler {
-  (props: { url: string; method: string; body?: IProduct[] }): Promise<void>;
-}
-
-const useFetchHandler = (): FetchHandler => {
+const useFetchHandler = () => {
   const fetchHandler = async ({
     url,
     method,

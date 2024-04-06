@@ -22,7 +22,8 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const fetchHandler = useFetchHandler();
   const { headers, readFile, loading } = useFileHandler();
-  const { products, init, update, remove, clear, add } = useProductsHandler();
+  const { products, init, update, remove, clear, add, ifSkusExists } =
+    useProductsHandler();
 
   const [modalName, setModalName] = useState<string | null>(null);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
@@ -55,19 +56,23 @@ export default function Index() {
       setError(`SKU already exists: ${errors.join(", ")}`);
       return;
     }
-    setModalName(null);
+    closeModal();
   };
 
   const handleEdit = async (values: IProduct) => {
     if (!selectedSku) return;
+    if (ifSkusExists(values.sku)) {
+      setError("SKU already exists");
+      return;
+    }
     update(selectedSku, values);
-    setModalName(null);
+    closeModal();
   };
 
   const handleDelete = async () => {
     if (!selectedSku) return;
     remove(selectedSku);
-    setModalName(null);
+    closeModal();
   };
 
   const handleClear = async () => {
@@ -80,20 +85,17 @@ export default function Index() {
       setError(error);
       return;
     }
-    setModalName(null);
+    closeModal();
   };
 
   const handleSaveAll = async () => {
     // // fetchHandler
     const response = await fetchHandler({
-      url: "/api/save",
+      url: "/product/save",
       method: "POST",
       body: products,
     });
     console.log(response);
-    // if (!response) {
-    //   setErrorMessages(response);
-    // }
   };
 
   return (
