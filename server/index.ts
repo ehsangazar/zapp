@@ -1,12 +1,17 @@
-import Fastify from "fastify";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
+import product from "./routes/product";
 
-const app = Fastify();
+const fastify = Fastify({ logger: true });
 
-app.get("/", async (request, reply) => {
-  return { hello: "world" };
+fastify.get("/", (request: FastifyRequest, reply: FastifyReply) => {
+  reply.send({
+    success: true,
+  });
 });
 
-app.listen(3000, (err, address) => {
+fastify.register(product, { prefix: "/product" });
+
+fastify.listen(3000, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
