@@ -1,5 +1,8 @@
+import Typography from "../Typography/Typography";
+
 interface TProps {
   children: React.ReactNode;
+  errors?: string[];
 }
 
 const TH = ({ children }: TProps) => (
@@ -12,11 +15,29 @@ const TD = ({ children }: TProps) => (
     {children}
   </td>
 );
-const TR = ({ children }: TProps) => (
-  <tr className=" nth-child(odd:bg-blue-100) nth-child(even:bg-gray-500) hover:bg-gray-300 ">
-    {children}
-  </tr>
-);
+const TR = ({ children, errors }: TProps) => {
+  return !errors?.length ? (
+    <tr className="nth-child(odd:bg-blue-100) nth-child(even:bg-gray-500) hover:bg-gray-300 ">
+      {children}
+    </tr>
+  ) : (
+    <>
+      <tr className="tr-error">{children}</tr>
+      <tr className="tr-error">
+        <td colSpan={5} className="bg-red-700 pl-2">
+          <Typography.SMALL dark>Invalid product</Typography.SMALL>
+          <ul className="list-disc list-inside text-white">
+            {errors?.map((error, index) => (
+              <li key={`error-${index}`}>
+                <Typography.SMALL dark>{error}</Typography.SMALL>
+              </li>
+            ))}
+          </ul>
+        </td>
+      </tr>
+    </>
+  );
+};
 const TRHEAD = ({ children }: TProps) => (
   <tr className="bg-blue-900">{children}</tr>
 );

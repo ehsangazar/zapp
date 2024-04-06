@@ -21,7 +21,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const fetchHandler = useFetchHandler();
-  const { headers, rows, readFile, loading } = useFileHandler();
+  const { headers, readFile, loading } = useFileHandler();
   const { products, init, update, remove, clear, add } = useProductsHandler();
 
   const [modalName, setModalName] = useState<string | null>(null);

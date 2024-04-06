@@ -1,24 +1,9 @@
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import Button from "~/components/Button/Button";
 import Input from "~/components/Input/Input";
-import IProduct from "~/types/IProduct";
-import * as yup from "yup";
+import IProduct, { productSchema } from "~/types/IProduct";
 import InputTextArea from "~/components/InputTextArea/InputTextArea";
 import Alert from "~/components/Alert/Alert";
-
-const productSchema = yup.object().shape({
-  sku: yup
-    .string()
-    .matches(/^[A-Z]{2}-\d+$/, "Invalid SKU")
-    .required("SKU is required"),
-  quantity: yup
-    .number()
-    .required("Quantity is required")
-    .positive("Quantity must be positive")
-    .integer("Quantity must be an integer"),
-  description: yup.string().required("Description is required"),
-  store: yup.string().required("Store is required"),
-});
 
 interface FormProductProps {
   productSelected: IProduct | null;

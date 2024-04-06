@@ -25,7 +25,7 @@ const TableProducts = ({ headers, products, openModal }: TableProps) => (
     </TABLE_PARENT.THEAD>
     <TABLE_PARENT.TBODY>
       {products.map((product) => (
-        <TABLE_PARENT.TR key={`product-${product.sku}`}>
+        <TABLE_PARENT.TR key={`product-${product.sku}`} errors={product.errors}>
           <TABLE_PARENT.TD>{product.sku}</TABLE_PARENT.TD>
           <TABLE_PARENT.TD>{product.quantity}</TABLE_PARENT.TD>
           <TABLE_PARENT.TD>{product.description}</TABLE_PARENT.TD>

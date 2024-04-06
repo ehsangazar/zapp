@@ -1,4 +1,4 @@
-import IProduct from "~/types/IProduct";
+import IProduct, { productSchema } from "~/types/IProduct";
 import { useState } from "react";
 
 const useProductsHandler = () => {
@@ -15,14 +15,17 @@ const useProductsHandler = () => {
         return !exist;
       })
       .map((row: string[]) => {
-        return {
+        const product: IProduct = {
           quantity: Number(row[0].trim()),
           sku: row[1].trim(),
           description: row[2].trim(),
           store: row[3].trim(),
-          updated: true,
-          saved: false,
         };
+        productSchema.validate(product, { abortEarly: false }).catch((err) => {
+          product.errors = err.errors;
+        });
+        console.log("debug product", product);
+        return product;
       });
     setProducts([...products, ...newProducts]);
     return errors;

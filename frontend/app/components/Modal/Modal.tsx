@@ -33,7 +33,7 @@ const Modal = ({ closeModal, title, children }: ModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div ref={ref} className="bg-white w-full md:w-1/2 p-6 rounded-lg">
+      <div ref={ref} className="bg-white w-full md:w-1/2 p-6 rounded-lg mx-2">
         <div className="flex justify-between">
           <h1 className="text-2xl font-bold">{title}</h1>
           <button onClick={closeModal} className="text-2xl font-bold">
