@@ -24,12 +24,13 @@ const TableProducts = ({ headers, products, openModal }: TableProps) => (
       </TABLE_PARENT.TRHEAD>
     </TABLE_PARENT.THEAD>
     <TABLE_PARENT.TBODY>
-      {products.map((product) => (
+      {products.map((product: IProduct) => (
         <TABLE_PARENT.TR key={`product-${product.sku}`} errors={product.errors}>
-          <TABLE_PARENT.TD>{product.sku}</TABLE_PARENT.TD>
-          <TABLE_PARENT.TD>{product.quantity}</TABLE_PARENT.TD>
-          <TABLE_PARENT.TD>{product.description}</TABLE_PARENT.TD>
-          <TABLE_PARENT.TD>{product.store}</TABLE_PARENT.TD>
+          {headers.map((header, index) => (
+            <TABLE_PARENT.TD key={`product-${product.sku}-header-${index}`}>
+              {product[header.toLowerCase().trim() as keyof IProduct]}
+            </TABLE_PARENT.TD>
+          ))}
           <TABLE_PARENT.TD>
             <div className="flex justify-between items-center">
               <div className="mr-4">

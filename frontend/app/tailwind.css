@@ -7,3 +7,6 @@
 .min-h-no-footer-header {
   min-height: calc(100vh - 8rem);
 }
+.tr-error {
+  border: 3px solid rgb(185 28 28) !important
+}

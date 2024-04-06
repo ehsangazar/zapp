@@ -15,19 +15,24 @@ const Button = ({
   onClick,
   type = "button",
 }: ButtonProps) => {
-  const color =
+  let color =
     colorScheme === "primary"
       ? "bg-blue-800"
       : colorScheme === "secondary"
       ? "bg-green-800"
       : "bg-red-800";
 
-  const hover =
+  let hover =
     colorScheme === "primary"
       ? "hover:bg-blue-700"
       : colorScheme === "secondary"
       ? "hover:bg-green-700"
       : "hover:bg-red-700";
+
+  if (disabled) {
+    color = "bg-gray-400";
+    hover = "";
+  }
 
   return (
     <button

@@ -32,6 +32,11 @@ export default function Index() {
     (product) => selectedSku === product.sku
   )[0];
 
+  const isValid =
+    products.filter(
+      (product: IProduct) => product?.errors && product.errors.length > 0
+    ).length === 0;
+
   const openModal = (sku: string | null, name: string) => {
     setSelectedSku(sku);
     setModalName(name);
@@ -128,7 +133,11 @@ export default function Index() {
               </Button>
             </div>
             <div>
-              <Button onClick={handleSaveAll} colorScheme="secondary">
+              <Button
+                onClick={handleSaveAll}
+                colorScheme="secondary"
+                disabled={!isValid}
+              >
                 Save All
               </Button>
             </div>
