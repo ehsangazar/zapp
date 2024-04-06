@@ -85,12 +85,13 @@ export default function Index() {
 
   const handleSaveAll = async () => {
     // // fetchHandler
-    // const response = await fetchHandler({
-    //   url: "/api/save",
-    //   method: "POST",
-    //   body: fileData,
-    // });
-    // if (response) {
+    const response = await fetchHandler({
+      url: "/api/save",
+      method: "POST",
+      body: products,
+    });
+    console.log(response);
+    // if (!response) {
     //   setErrorMessages(response);
     // }
   };
@@ -138,7 +139,7 @@ export default function Index() {
                 colorScheme="secondary"
                 disabled={!isValid}
               >
-                Save All
+                Save
               </Button>
             </div>
           </div>

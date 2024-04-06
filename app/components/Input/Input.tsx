@@ -38,20 +38,20 @@ const Input = ({ label, type, name }: InputProps) => {
               id={field.name}
               type={type}
               className="w-full
-              bg-gray-200
-              rounded-lg
-              border-2
-              border-gray-400
-              h-10
-              px-3
-              text-gray-800
-              focus:outline-none
-              focus:border-primary
-              focus:bg-white
-              transition-all
-              duration-300
-              ease-in-out
-            "
+                bg-gray-200
+                rounded-lg
+                border-2
+                border-gray-400
+                h-10
+                px-3
+                text-gray-800
+                focus:outline-none
+                focus:border-primary
+                focus:bg-white
+                transition-all
+                duration-300
+                ease-in-out
+              "
             />
             {form.errors[field.name] && form.touched[field.name] && (
               <div className="text-red-500 text-sm">
