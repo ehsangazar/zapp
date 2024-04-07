@@ -49,6 +49,9 @@ export default function Index() {
       (product: IProduct) => product?.errors && product.errors.length > 0
     ).length === 0;
 
+  const isAnythingToSave =
+    products.filter((product: IProduct) => !product?.isSaved).length > 0;
+
   const openModal = (sku: string | null, name: string) => {
     setSelectedSku(sku);
     setModalName(name);
@@ -152,11 +155,11 @@ export default function Index() {
             <div>
               <Button
                 onClick={handleSaveAll}
-                colorScheme="secondary"
+                colorScheme={isAnythingToSave ? "primary" : "secondary"}
                 disabled={fetchLoading || !isValid}
                 loading={fetchLoading}
               >
-                Save
+                {isAnythingToSave ? "Save All" : "Saved"}
               </Button>
             </div>
           </div>
