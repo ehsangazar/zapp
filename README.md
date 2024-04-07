@@ -46,6 +46,7 @@ simply run
 npm install -g pnpm
 pnpm install
 npx prisma generate
+npx prisma db push
 ```
 
 ## Development
@@ -58,6 +59,14 @@ pnpm run dev
 
 FrontEnd Local URL: http://0.0.0.0:5173
 Backend Local URL: http://0.0.0.0:3000
+
+## Docker
+
+```
+docker build -t zapp-docker . && docker run -p 3000:3000 -p 8080:8080 zapp-docker
+```
+
+And everything will be available on http://localhost:8080
 
 ## Deployment
 
