@@ -42,4 +42,10 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
   });
 }
 
-export { create };
+async function list(request: FastifyRequest, reply: FastifyReply) {
+  const products = await prisma.product.findMany();
+
+  reply.send(products);
+}
+
+export { create, list };

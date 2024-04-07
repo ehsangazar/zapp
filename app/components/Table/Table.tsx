@@ -24,7 +24,7 @@ const TR = ({ children, errors }: TProps) => {
     <>
       <tr className="tr-error">{children}</tr>
       <tr className="tr-error">
-        <td colSpan={5} className="bg-red-700 pl-2">
+        <td colSpan={10} className="bg-red-700 pl-2">
           <Typography.SMALL dark>Invalid product: </Typography.SMALL>
           <ul className="list-disc list-inside text-white">
             {errors?.map((error, index) => (

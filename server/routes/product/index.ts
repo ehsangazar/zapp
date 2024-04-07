@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { create } from "./controller";
+import { create, list } from "./controller";
 import * as yup from "yup";
 import { productSchema } from "../../../prisma/types/IProduct";
 import {
@@ -8,6 +8,7 @@ import {
 } from "~/types/IFastify";
 
 async function routes(fastify: FastifyInstance) {
+  fastify.get("/", list);
   fastify.post(
     "/",
     {

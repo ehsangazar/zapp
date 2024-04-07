@@ -10,7 +10,7 @@ interface ResponseType {
 const useProductsHandler = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
 
-  const init = (data: string[][]): string[] => {
+  const initFromCSV = (data: string[][]): string[] => {
     const errors: string[] = [];
     const newProducts = data
       .filter((row: string[]) => {
@@ -35,6 +35,14 @@ const useProductsHandler = () => {
       });
     setProducts([...products, ...newProducts]);
     return errors;
+  };
+
+  const initFromAPI = (data: IProduct[]): void => {
+    const newProducts = data.map((product) => {
+      product.isSaved = true;
+      return product;
+    });
+    setProducts(newProducts);
   };
 
   const ifSkusExists = (sku: string): boolean => {
@@ -107,7 +115,8 @@ const useProductsHandler = () => {
 
   return {
     products,
-    init,
+    initFromCSV,
+    initFromAPI,
     update,
     remove,
     clear,

@@ -52,6 +52,13 @@ const P = ({ children, dark }: TypographyProps) =>
     <p className="text-base text-gray-800">{children}</p>
   );
 
+const NORMAL = ({ children, dark }: TypographyProps) =>
+  dark ? (
+    <span className="text-base text-white">{children}</span>
+  ) : (
+    <span className="text-base text-gray-800">{children}</span>
+  );
+
 const SMALL = ({ children, dark }: TypographyProps) =>
   dark ? (
     <small className="text-sm text-white">{children}</small>
@@ -67,6 +74,7 @@ const Typography = {
   H5,
   H6,
   P,
+  NORMAL,
   SMALL,
 };
 

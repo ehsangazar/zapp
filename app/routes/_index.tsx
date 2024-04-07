@@ -11,6 +11,10 @@ import useProductsHandler from "~/hooks/useProductsHandler";
 import FormImport from "~/containers/FormImport/FormImport";
 import FormProduct from "~/containers/FormProduct/FormProduct";
 import IProduct from "../../prisma/types/IProduct";
+import { HiUpload } from "react-icons/hi";
+import { FiDelete } from "react-icons/fi";
+import { BiPlus, BiSave } from "react-icons/bi";
+import { MdRequestPage } from "react-icons/md";
 
 export const meta: MetaFunction = () => {
   return [
@@ -20,11 +24,15 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const { fetchHandler, loading: fetchLoading } = useFetchHandler();
+  const fetchHandler = useFetchHandler();
+  const [loadingSave, setLoadingSave] = useState<boolean>(false);
+  const [loadingFetchProducts, setLoadingFetchProducts] =
+    useState<boolean>(false);
   const { headers, readFile, loading: fileLoading } = useFileHandler();
   const {
     products,
-    init,
+    initFromCSV,
+    initFromAPI,
     update,
     remove,
     clear,
@@ -66,7 +74,7 @@ export default function Index() {
   const handleImport = async (values: { file: File | null }) => {
     if (!values.file) return;
     const newRows = await readFile(values.file);
-    const errors = init(newRows);
+    const errors = initFromCSV(newRows);
     if (errors.length > 0) {
       setError(`SKU already exists: ${errors.join(", ")}`);
       return;
@@ -104,6 +112,7 @@ export default function Index() {
   };
 
   const handleSaveAll = async () => {
+    setLoadingSave(true);
     const newProducts = getToSaveProducts();
     if (newProducts.length === 0) return;
     const response = await fetchHandler({
@@ -111,7 +120,19 @@ export default function Index() {
       method: "POST",
       body: newProducts,
     });
+    setLoadingSave(false);
     saveAll(response);
+    setUpdateUi(updateUi + 1);
+  };
+
+  const handlefetchProducts = async () => {
+    setLoadingFetchProducts(true);
+    const response = await fetchHandler({
+      url: "/v1/product",
+      method: "GET",
+    });
+    setLoadingFetchProducts(false);
+    initFromAPI(response);
     setUpdateUi(updateUi + 1);
   };
 
@@ -129,16 +150,31 @@ export default function Index() {
         "
         >
           <div className="flex mb-4">
-            <div className="mr-1 md:mr-4">
+            <div className="mr-1 md:mr-2">
               <Button
                 onClick={() => openModal(null, "import")}
                 colorScheme="primary"
+                icon={<HiUpload size={15} />}
               >
                 Import
               </Button>
             </div>
+            <div className="mr-1 md:mr-2">
+              <Button
+                onClick={handlefetchProducts}
+                colorScheme="primary"
+                icon={<MdRequestPage size={15} />}
+                loading={loadingFetchProducts}
+              >
+                Fetch
+              </Button>
+            </div>
             <div>
-              <Button onClick={handleClear} colorScheme="danger">
+              <Button
+                onClick={handleClear}
+                colorScheme="danger"
+                icon={<FiDelete size={15} />}
+              >
                 Clear
               </Button>
             </div>
@@ -148,6 +184,7 @@ export default function Index() {
               <Button
                 onClick={() => openModal(null, "add")}
                 colorScheme="primary"
+                icon={<BiPlus size={15} />}
               >
                 Add
               </Button>
@@ -156,8 +193,9 @@ export default function Index() {
               <Button
                 onClick={handleSaveAll}
                 colorScheme={isAnythingToSave ? "primary" : "secondary"}
-                disabled={fetchLoading || !isValid}
-                loading={fetchLoading}
+                disabled={loadingSave || !isValid}
+                loading={loadingSave}
+                icon={<BiSave size={15} />}
               >
                 {isAnythingToSave ? "Save All" : "Saved"}
               </Button>

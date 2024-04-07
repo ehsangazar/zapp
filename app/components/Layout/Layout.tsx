@@ -15,10 +15,10 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
         min-h-no-footer-header
         flex
         flex-col
-        md:flex-row
+        xl:flex-row
       "
       >
-        <aside className="p-4 bg-gray-200 col-span-1 md:col-span-1 min-w-52">
+        <aside className="p-4 bg-gray-200 col-span-1 xl:col-span-1 min-w-52">
           <Typography.H3>Welcome</Typography.H3>
         </aside>
         <main className="p-4 w-full">{children}</main>

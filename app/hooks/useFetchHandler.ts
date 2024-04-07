@@ -1,9 +1,6 @@
-import { useState } from "react";
 import IProduct from "../../prisma/types/IProduct";
 
 const useFetchHandler = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-
   const fetchHandler = async ({
     url,
     method,
@@ -14,7 +11,6 @@ const useFetchHandler = () => {
     body?: IProduct[];
   }) => {
     try {
-      setLoading(true);
       const newUrl = `${window.ENV.SERVER_URL}/api${url}`;
       const response = await fetch(newUrl, {
         method: method,
@@ -23,18 +19,13 @@ const useFetchHandler = () => {
         },
         body: JSON.stringify(body),
       });
-      setLoading(false);
       return await response.json();
     } catch (error) {
-      setLoading(false);
       console.error(error);
     }
   };
 
-  return {
-    loading,
-    fetchHandler,
-  };
+  return fetchHandler;
 };
 
 export default useFetchHandler;

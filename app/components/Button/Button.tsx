@@ -1,3 +1,5 @@
+import Typography from "../Typography/Typography";
+
 interface ButtonProps {
   children: React.ReactNode;
   colorScheme?: "primary" | "secondary" | "danger";
@@ -5,6 +7,7 @@ interface ButtonProps {
   loading?: boolean;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
+  icon?: React.ReactNode;
 }
 
 const Button = ({
@@ -14,6 +17,7 @@ const Button = ({
   loading,
   onClick,
   type = "button",
+  icon,
 }: ButtonProps) => {
   let color =
     colorScheme === "primary"
@@ -36,12 +40,21 @@ const Button = ({
 
   return (
     <button
-      className={`px-4 py-2 rounded text-white ${color} ${hover} transition-colors duration-200 ease-in-out`}
+      className={`flex px-3 h-10 py-2 rounded text-white ${color} ${hover} transition-colors duration-200 ease-in-out justify-center items-center`}
       disabled={disabled}
       onClick={onClick}
       type={type}
     >
-      {loading ? "Loading..." : children}
+      {icon && <span className="flex sm:mr-1 text-center">{icon}</span>}
+      <div
+        className={`${
+          icon ? "hidden sm:block" : ""
+        } flex items-center justify-center`}
+      >
+        <Typography.NORMAL dark>
+          {loading ? "Loading..." : children}
+        </Typography.NORMAL>
+      </div>
     </button>
   );
 };
