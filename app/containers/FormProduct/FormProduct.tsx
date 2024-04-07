@@ -1,7 +1,7 @@
 import { Form, Formik } from "formik";
 import Button from "~/components/Button/Button";
 import Input from "~/components/Input/Input";
-import IProduct, { productSchema } from "~/types/IProduct";
+import IProduct, { productSchema } from "../../../prisma/types/IProduct";
 import InputTextArea from "~/components/InputTextArea/InputTextArea";
 import Alert from "~/components/Alert/Alert";
 
@@ -19,12 +19,14 @@ const FormProduct = ({
   return (
     <div>
       <Formik
-        initialValues={{
-          sku: productSelected?.sku || "",
-          quantity: productSelected?.quantity || 0,
-          description: productSelected?.description || "",
-          store: productSelected?.store || "",
-        }}
+        initialValues={
+          {
+            sku: productSelected?.sku || "",
+            quantity: productSelected?.quantity || 0,
+            description: productSelected?.description || "",
+            store: productSelected?.store || "",
+          } as IProduct
+        }
         validationSchema={productSchema}
         onSubmit={onSubmit}
       >

@@ -10,7 +10,7 @@ import useFileHandler from "~/hooks/useFileHandler";
 import useProductsHandler from "~/hooks/useProductsHandler";
 import FormImport from "~/containers/FormImport/FormImport";
 import FormProduct from "~/containers/FormProduct/FormProduct";
-import IProduct from "~/types/IProduct";
+import IProduct from "../../prisma/types/IProduct";
 
 export const meta: MetaFunction = () => {
   return [

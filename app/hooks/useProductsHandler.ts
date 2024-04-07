@@ -1,4 +1,4 @@
-import IProduct, { productSchema } from "~/types/IProduct";
+import IProduct, { productSchema } from "prisma/types/IProduct";
 import { useState } from "react";
 
 const useProductsHandler = () => {

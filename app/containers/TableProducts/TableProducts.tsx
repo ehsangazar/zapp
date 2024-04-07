@@ -1,7 +1,7 @@
 import Button from "~/components/Button/Button";
 import TABLE_PARENT from "~/components/Table/Table";
 import Typography from "~/components/Typography/Typography";
-import IProduct from "~/types/IProduct";
+import IProduct from "../../../prisma/types/IProduct";
 
 interface TableProps {
   headers: string[];

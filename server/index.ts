@@ -1,7 +1,10 @@
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import product from "./routes/product";
+import errorHandler from "./utils/errorHandler";
 
 const fastify = Fastify({ logger: true });
+
+fastify.setErrorHandler(errorHandler);
 
 fastify.get("/", (request: FastifyRequest, reply: FastifyReply) => {
   reply.send({
@@ -11,10 +14,9 @@ fastify.get("/", (request: FastifyRequest, reply: FastifyReply) => {
 
 fastify.register(product, { prefix: "/product" });
 
-fastify.listen(3000, (err, address) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log(`Server listening at ${address}`);
-});
+try {
+  await fastify.listen({ port: 3000 });
+} catch (err) {
+  fastify.log.error(err);
+  process.exit(1);
+}

@@ -18,3 +18,13 @@ export interface IFastify {
   Headers: IHeaders;
   Reply: IReply;
 }
+
+export interface IValidationCompiler {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schema: any;
+}
+
+export interface IValidationCompilerResult {
+  value?: unknown;
+  errors?: unknown;
+}

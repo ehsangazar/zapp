@@ -1,4 +1,4 @@
-import IProduct from "~/types/IProduct";
+import IProduct from "../../prisma/types/IProduct";
 
 const useFetchHandler = () => {
   const fetchHandler = async ({
