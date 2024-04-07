@@ -6,7 +6,7 @@ import asyncForEach from "../../utils/asyncForEach";
 async function create(request: FastifyRequest, reply: FastifyReply) {
   const data = request.body as IProduct[];
 
-  const messages: string[] = [];
+  const messages: Record<string, string> = {};
 
   await asyncForEach(data, async (product: IProduct) => {
     const existingProduct = await prisma.product.findUnique({
@@ -15,26 +15,29 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
       },
     });
 
-    if (existingProduct) {
-      messages.push(`Product with sku: ${product.sku} already exists`);
-      return;
-    } else {
-      await prisma.product.update({
-        where: {
-          sku: product.sku,
-        },
+    try {
+      if (existingProduct) {
+        await prisma.product.update({
+          where: {
+            sku: product.sku,
+          },
+          data: product,
+        });
+        messages[product.sku] = "updated";
+        return;
+      }
+
+      await prisma.product.create({
         data: product,
       });
+      messages[product.sku] = "created";
+    } catch (error) {
+      messages[product.sku] = "Something went wrong. Please try again later.";
     }
-
-    await prisma.product.create({
-      data: product,
-    });
-    messages.push(`Product with sku: ${product.sku} created successfully`);
   });
 
   reply.send({
-    message: "Product created successfully",
+    message: "DONE!",
     data: messages,
   });
 }

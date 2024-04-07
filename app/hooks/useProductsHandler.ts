@@ -1,5 +1,11 @@
+import { c } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 import IProduct, { productSchema } from "prisma/types/IProduct";
 import { useState } from "react";
+
+interface ResponseType {
+  message: string;
+  data: Record<string, string>;
+}
 
 const useProductsHandler = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -20,11 +26,11 @@ const useProductsHandler = () => {
           sku: row[1].trim(),
           description: row[2].trim(),
           store: row[3].trim(),
+          isSaved: false,
         };
         productSchema.validate(product, { abortEarly: false }).catch((err) => {
           product.errors = err.errors;
         });
-        console.log("debug product", product);
         return product;
       });
     setProducts([...products, ...newProducts]);
@@ -32,14 +38,17 @@ const useProductsHandler = () => {
   };
 
   const ifSkusExists = (sku: string): boolean => {
-    return products.find((product) => product.sku.trim() === sku.trim())
-      ? true
-      : false;
+    const exist: IProduct | undefined = products.find(
+      (product) => product.sku.trim() === sku.trim()
+    );
+    if (!exist) return false;
+    return exist.sku !== sku;
   };
 
   const update = (sku: string, data: IProduct): void => {
     const newProducts = products.map((product: IProduct) => {
       if (product.sku === sku) {
+        data.isSaved = false;
         return data;
       }
       return product;
@@ -58,17 +67,55 @@ const useProductsHandler = () => {
     setProducts([]);
   };
 
+  const saveAll = (response: ResponseType): void => {
+    const { data } = response;
+    products.forEach((product) => {
+      if (data[product.sku] === "created" || data[product.sku] === "updated") {
+        product.isSaved = true;
+      } else if (data[product.sku] === "error") {
+        product.isSaved = false;
+        product.errors = [data[product.sku]];
+      }
+    });
+  };
+
+  const getToSaveProducts = (): IProduct[] => {
+    const newProducts: IProduct[] = [];
+    products.forEach((product) => {
+      if (!product.isSaved) {
+        newProducts.push({
+          sku: product.sku,
+          description: product.description,
+          quantity: product.quantity,
+          store: product.store,
+        });
+      }
+    });
+    return newProducts;
+  };
+
   const add = (data: IProduct) => {
     let error = null;
     if (products.find((product) => product.sku.trim() === data.sku.trim())) {
       error = "SKU already exists";
       return;
     }
+    data.isSaved = false;
     setProducts([...products, data]);
     return error;
   };
 
-  return { products, init, update, remove, clear, add, ifSkusExists };
+  return {
+    products,
+    init,
+    update,
+    remove,
+    clear,
+    add,
+    ifSkusExists,
+    saveAll,
+    getToSaveProducts,
+  };
 };
 
 export default useProductsHandler;

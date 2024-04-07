@@ -45,7 +45,7 @@ const FormProduct = ({
             <Input label="Store" name="store" type="text" />
           </div>
           <Button type="submit" colorScheme="primary">
-            {productSelected ? "Save" : "Add"}
+            {productSelected ? "Update" : "Add"}
           </Button>
         </Form>
       </Formik>

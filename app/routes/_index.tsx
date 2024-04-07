@@ -20,11 +20,21 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const fetchHandler = useFetchHandler();
-  const { headers, readFile, loading } = useFileHandler();
-  const { products, init, update, remove, clear, add, ifSkusExists } =
-    useProductsHandler();
+  const { fetchHandler, loading: fetchLoading } = useFetchHandler();
+  const { headers, readFile, loading: fileLoading } = useFileHandler();
+  const {
+    products,
+    init,
+    update,
+    remove,
+    clear,
+    add,
+    ifSkusExists,
+    saveAll,
+    getToSaveProducts,
+  } = useProductsHandler();
 
+  const [updateUi, setUpdateUi] = useState<number>(0);
   const [modalName, setModalName] = useState<string | null>(null);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +44,7 @@ export default function Index() {
   )[0];
 
   const isValid =
+    products.length > 0 &&
     products.filter(
       (product: IProduct) => product?.errors && product.errors.length > 0
     ).length === 0;
@@ -41,6 +52,7 @@ export default function Index() {
   const openModal = (sku: string | null, name: string) => {
     setSelectedSku(sku);
     setModalName(name);
+    setError(null);
   };
 
   const closeModal = () => {
@@ -89,13 +101,15 @@ export default function Index() {
   };
 
   const handleSaveAll = async () => {
-    // // fetchHandler
+    const newProducts = getToSaveProducts();
+    if (newProducts.length === 0) return;
     const response = await fetchHandler({
-      url: "/product/save",
+      url: "/v1/product",
       method: "POST",
-      body: products,
+      body: newProducts,
     });
-    console.log(response);
+    saveAll(response);
+    setUpdateUi(updateUi + 1);
   };
 
   return (
@@ -139,7 +153,8 @@ export default function Index() {
               <Button
                 onClick={handleSaveAll}
                 colorScheme="secondary"
-                disabled={!isValid}
+                disabled={fetchLoading || !isValid}
+                loading={fetchLoading}
               >
                 Save
               </Button>
@@ -147,10 +162,11 @@ export default function Index() {
           </div>
         </div>
 
-        {loading && <p>Loading...</p>}
+        {fileLoading && <p>Loading...</p>}
         {products.length === 0 && <p>No products</p>}
         {products.length > 0 && (
           <TableProducts
+            key={`TableProducts-${updateUi}`}
             headers={headers}
             products={products}
             openModal={openModal}

@@ -1,8 +1,8 @@
 import * as yup from "yup";
 import { Product } from "@prisma/client";
 
-interface IProduct extends Product {
-  isValid?: boolean;
+interface IProduct extends Omit<Product, "createdAt" | "updatedAt"> {
+  isSaved?: boolean;
   errors?: string[];
 }
 
