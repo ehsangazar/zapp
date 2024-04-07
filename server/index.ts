@@ -20,7 +20,8 @@ fastify.get("/", (request: FastifyRequest, reply: FastifyReply) => {
 fastify.register(product, { prefix: "/api/v1/product" });
 
 try {
-  await fastify.listen({ port: 3000 });
+  const PORT = Number(process.env.SERVER_PORT || 3000);
+  await fastify.listen({ port: PORT });
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);
