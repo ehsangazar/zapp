@@ -45,6 +45,7 @@ simply run
 ```
 npm install -g pnpm
 pnpm install
+npx prisma generate
 ```
 
 ## Development
@@ -55,8 +56,8 @@ Run both backend and frontend
 pnpm run dev
 ```
 
-FrontEnd Local URL: http://localhost:5173
-Backend Local URL: http://localhost:3000
+FrontEnd Local URL: http://0.0.0.0:5173
+Backend Local URL: http://0.0.0.0:3000
 
 ## Deployment
 
