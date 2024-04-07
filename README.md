@@ -2,7 +2,7 @@
 
 ## Intro Video
 
-https://www.loom.com/share/9220208c26ed4d0a894a6aea3e85db7b
+[Loom](https://www.loom.com/share/9220208c26ed4d0a894a6aea3e85db7b)
 
 ## Tech Decisions
 
@@ -32,10 +32,20 @@ Not Ideal -> better is either
 
 - No Pagination is developed, however, we definitely need paignation for experience or number items we can mount tot he page! I could use React Virtualised Table or Developed my own to render less or only items in the view
 - Similarly fetch is only for demonstration of records, no pagination is implemented
+- Testing: There is no test written, as I thought based on Description on the test, it's not something that you want are interested in, However, this is absoltely needed for real projects.
 
 ## Env Varibales
 
 Create the .env file based on .env.example
+
+## Install Dependencies
+
+simply run
+
+```
+npm install -g pnpm
+pnpm install
+```
 
 ## Development
 
