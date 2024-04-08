@@ -193,7 +193,7 @@ export default function Index() {
               <Button
                 onClick={handleSaveAll}
                 colorScheme={isAnythingToSave ? "primary" : "secondary"}
-                disabled={loadingSave || !isValid}
+                disabled={!isAnythingToSave || loadingSave || !isValid}
                 loading={loadingSave}
                 icon={<BiSave size={15} />}
               >
