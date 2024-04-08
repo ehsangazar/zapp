@@ -4,6 +4,12 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
+[env]
+  PORT = "8080"
+  NODE_ENV = 'production'
+  HOST = '0.0.0.0'
+  SERVER_URL = "https://zapp-app.fly.dev:3000"
+
 [experimental]
   allowed_public_ports = []
   auto_rollback = true

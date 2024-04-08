@@ -1,4 +1,3 @@
-import { c } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 import IProduct, { productSchema } from "prisma/types/IProduct";
 import { useState } from "react";
 
@@ -24,6 +23,7 @@ const useProductsHandler = () => {
         const product: IProduct = {
           quantity: Number(row[0].trim()),
           sku: row[1].trim(),
+          oldSku: row[1].trim(),
           description: row[2].trim(),
           store: row[3].trim(),
           isSaved: false,
@@ -57,6 +57,7 @@ const useProductsHandler = () => {
     const newProducts = products.map((product: IProduct) => {
       if (product.sku === sku) {
         data.isSaved = false;
+        data.oldSku = product.sku;
         return data;
       }
       return product;
@@ -93,6 +94,7 @@ const useProductsHandler = () => {
       if (!product.isSaved) {
         newProducts.push({
           sku: product.sku,
+          oldSku: product.oldSku,
           description: product.description,
           quantity: product.quantity,
           store: product.store,
@@ -109,6 +111,7 @@ const useProductsHandler = () => {
       return;
     }
     data.isSaved = false;
+    data.oldSku = data.sku;
     setProducts([...products, data]);
     return error;
   };

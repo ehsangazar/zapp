@@ -11,7 +11,7 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
   await asyncForEach(data, async (product: IProduct) => {
     const existingProduct = await prisma.product.findUnique({
       where: {
-        sku: product.sku,
+        sku: product.oldSku,
       },
     });
 
@@ -19,19 +19,30 @@ async function create(request: FastifyRequest, reply: FastifyReply) {
       if (existingProduct) {
         await prisma.product.update({
           where: {
-            sku: product.sku,
+            sku: product.oldSku,
           },
-          data: product,
+          data: {
+            sku: product.sku,
+            description: product.description,
+            store: product.store,
+            quantity: product.quantity,
+          },
         });
         messages[product.sku] = "updated";
         return;
       }
 
       await prisma.product.create({
-        data: product,
+        data: {
+          sku: product.sku,
+          description: product.description,
+          store: product.store,
+          quantity: product.quantity,
+        },
       });
       messages[product.sku] = "created";
     } catch (error) {
+      console.error(error);
       messages[product.sku] = "Something went wrong. Please try again later.";
     }
   });

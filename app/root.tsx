@@ -16,7 +16,7 @@ export const links: LinksFunction = () => [
 export async function loader() {
   return json({
     ENV: {
-      SERVER_URL: process.env.SERVER_URL || "https://zapp-app.fly.dev:3000",
+      SERVER_URL: process.env.SERVER_URL || "http://0.0.0.0:3000",
     },
   });
 }
