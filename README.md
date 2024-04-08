@@ -89,6 +89,8 @@ Now you'll need to pick a host to deploy it to.
 We can have a dockerfile deploy both frontend and backend
 Since there is a docker, we can deploy that easily to fly.
 
+Deployed Version: https://zapp-app.fly.dev:8080/
+
 ## Vercel for FrontEnd.
 
 We have different commands, so we can deploy frontend to Vercel
