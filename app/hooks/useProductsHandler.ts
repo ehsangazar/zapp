@@ -1,4 +1,4 @@
-import IProduct, { productSchema } from "prisma/types/IProduct";
+import IProduct, { productSchema } from "../../prisma/types/IProduct";
 import { useState } from "react";
 
 interface ResponseType {
@@ -6,8 +6,8 @@ interface ResponseType {
   data: Record<string, string>;
 }
 
-const useProductsHandler = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+const useProductsHandler = (defaultProducts: IProduct[] = []) => {
+  const [products, setProducts] = useState<IProduct[]>(defaultProducts);
 
   const initFromCSV = (data: string[][]): string[] => {
     const errors: string[] = [];
@@ -49,8 +49,7 @@ const useProductsHandler = () => {
     const exist: IProduct | undefined = products.find(
       (product) => product.sku.trim() === sku.trim()
     );
-    if (!exist) return false;
-    return exist.sku !== sku;
+    return !!exist;
   };
 
   const update = (sku: string, data: IProduct): void => {
@@ -106,9 +105,12 @@ const useProductsHandler = () => {
 
   const add = (data: IProduct) => {
     let error = null;
-    if (products.find((product) => product.sku.trim() === data.sku.trim())) {
+    const exist = products.find(
+      (product) => product.sku.trim() === data.sku.trim()
+    );
+    if (exist) {
       error = "SKU already exists";
-      return;
+      return error;
     }
     data.isSaved = false;
     data.oldSku = data.sku;
